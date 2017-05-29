@@ -12,5 +12,7 @@ module.exports = {
   api: {
     base: 'http://rapapi.org/mockjs/19098/%EF%BC%8F',
     creations: 'api/creations?',
+    up: 'api/up',
+    postbase:'http://rapapi.org/mockjs/19098/',
   }
 }

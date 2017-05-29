@@ -13,6 +13,7 @@ import {
   RefreshControl,
   TouchableHighlight,
   TabBarIOS,
+  AlertIOS,
   Dimensions,
   Image,
   ActivityIndicator,
@@ -24,13 +25,46 @@ let cachedResults = {
   items: [],
   total: 0,
 }
-/*
+
+
 
 let Item = React.createClass({
-  getInitialState(){
-
-  }
+  getInitialState(props){
+    let row = this.props.row;
+    return {
+      up: row.voted,
+      row: row,
+    }
+  },
+  _up(){
+    let that = this;
+    let up = !this.state.up;
+    let row = this.state.row;
+    let url = config.api.postbase + config.api.up;
+    let body = {
+      id: row._id,
+      up: up ? 'yes' : 'no',
+      accessToken: 'abc',
+    }
+    request.post(url, body)
+      .then(function (data) {
+        if (data && data.success) {
+          that.setState({
+            up: up,
+          })
+        }
+        else {
+          AlertIOS.alert('dia点赞失败，稍后重试');
+        }
+      })
+      .catch(function (err) {
+        console.log(err);
+        AlertIOS.alert('点赞失败，稍后重试');
+      })
+  },
   render(){
+    let row = this.state.row;
+    console.log(this.state);
     return (
       <TouchableHighlight>
         <View style={styles.item}>
@@ -49,11 +83,12 @@ let Item = React.createClass({
           <View style={styles.itemFooter}>
             <View style={styles.handleBox}>
               <Icon
-                name="ios-heart-outline"
+                name={this.state.up ? 'ios-heart' : 'ios-heart-outline' }
                 size={28}
-                style={styles.up}
+                onPress={this._up}
+                style={[styles.up, this.state.up ? null : styles.down]}
               />
-              <Text style={styles.handleText}>喜欢</Text>
+              <Text style={styles.handleText} onPress={this._up}>喜欢</Text>
             </View>
             <View style={styles.handleBox}>
               <Icon
@@ -69,7 +104,6 @@ let Item = React.createClass({
     )
   }
 })
-*/
 
 
 let List = React.createClass({
@@ -82,42 +116,7 @@ let List = React.createClass({
     };
   },
   _renderRow(row) {
-    return (
-      <TouchableHighlight>
-        <View style={styles.item}>
-          <Text style={styles.title}>
-            {row.title}
-          </Text>
-          <Image
-            style={styles.thumb}
-            source={{uri:row.thumb}}>
-            <Icon
-              name="ios-play"
-              size={28}
-              style={styles.play}
-            />
-          </Image>
-          <View style={styles.itemFooter}>
-            <View style={styles.handleBox}>
-              <Icon
-                name="ios-heart-outline"
-                size={28}
-                style={styles.up}
-              />
-              <Text style={styles.handleText}>喜欢</Text>
-            </View>
-            <View style={styles.handleBox}>
-              <Icon
-                name="ios-chatboxes-outline"
-                size={28}
-                style={styles.commentIcon}
-              />
-              <Text style={styles.handleText}>评论</Text>
-            </View>
-          </View>
-        </View>
-      </TouchableHighlight>
-    )
+    return <Item row={row}/>
   },
   _fetchData(page) {
     let that = this;
@@ -306,6 +305,14 @@ const styles = {
   loadingText: {
     color: '#777',
     textAlign: 'center',
+  },
+  down: {
+    fontSize: 22,
+    color: '#333',
+  },
+  up: {
+    fontSize: 22,
+    color: '#ed7b66',
   }
 }
 module.exports = List;
